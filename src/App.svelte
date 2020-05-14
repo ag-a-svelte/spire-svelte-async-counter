@@ -1,6 +1,13 @@
 <script>
   import Spinner from "./Spinner.svelte";
   let loading = 1;
+  const url = "http://api.icndb.com/jokes/random";
+  let joke = "";
+  async function fetch_joke() {
+    const response = await fetch(url);
+    const json = await response.json();
+    joke = json.value.joke;
+  }
 </script>
 
 <style>
@@ -21,13 +28,10 @@
     <div style="font-size: 300%">
       <Spinner {loading} />
     </div>
-
-    <h2>SpinSpire</h2>
-    <p>High performance, Open Source Web &amp; Mobile!</p>
+    <button on:click={fetch_joke}>Fetch Joke</button>
+    <h2>The Amazing Chuck Norris!</h2>
     <p>
-      <a href="https://spinspire.com/">spinspire.com</a>
-      |
-      <a href="https://youtube.com/spinspire">youtube.com/spinspire</a>
+      {#if joke}{joke}{:else}...{/if}
     </p>
   </div>
 </main>
