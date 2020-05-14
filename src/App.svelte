@@ -5,12 +5,23 @@
   const url = "http://api.icndb.com/jokes/random";
   $: delayed_url = `http://slowwly.robertomurray.co.uk/delay/${delay}/url/${url}`;
   let joke = "";
+
   async function fetch_joke() {
-    ++loading;
     const response = await fetch(delayed_url);
-    --loading;
     const json = await response.json();
     joke = json.value.joke;
+  }
+
+  /* returns a wrapper function that increments counter before calling
+     the wrapped function and decrements it after. */
+  function wrap(f) {
+    return async (...a) => {
+      ++loading;
+      // pass the same args
+      const result = await f(...a);
+      --loading;
+      return result;
+    };
   }
 </script>
 
@@ -28,7 +39,7 @@
       <Spinner {loading} />
     </div>
     <input bind:value={delay} type="number" step={1000} min={0} />
-    <button on:click={fetch_joke}>Fetch Joke</button>
+    <button on:click={wrap(fetch_joke)}>Fetch Joke</button>
     <h2>The Amazing Chuck Norris!</h2>
     <p>
       {#if joke}{joke}{:else}...{/if}
